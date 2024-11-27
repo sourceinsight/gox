@@ -1,10 +1,12 @@
 package globaltick
 
-import "time"
+import (
+	"sync/atomic"
+	"time"
+)
 
 var (
-	Now          time.Time // now
-	NowTimestamp int64     // now timestamp
+	nowTimestamp int64 // now timestamp
 )
 
 func init() {
@@ -12,8 +14,11 @@ func init() {
 	go func() {
 		for {
 			<-tick.C
-			Now = time.Now()
-			NowTimestamp = Now.Unix()
+			atomic.StoreInt64(&nowTimestamp, time.Now().Unix())
 		}
 	}()
+}
+
+func GetTimestamp() int64 {
+	return atomic.LoadInt64(&nowTimestamp)
 }
